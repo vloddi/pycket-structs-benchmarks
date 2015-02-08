@@ -1,2 +1,2 @@
 # pycket-structs-benchmarks
-Benchmarks for Structs in Pycket
+Micro-benchmarks for Structs in Pycket
