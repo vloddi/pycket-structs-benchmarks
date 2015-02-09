@@ -1,6 +1,6 @@
 #lang pycket
 
-(define SIZE 15000000)
+(define SIZE 30000000)
 
 (struct posn (x y))
 (struct 3dposn posn (z))
