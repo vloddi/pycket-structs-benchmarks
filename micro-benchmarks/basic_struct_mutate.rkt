@@ -1,6 +1,6 @@
 #lang pycket
 
-(define SIZE 50000000)
+(define SIZE 100000000)
 
 (struct posn (x y z) #:mutable)
 (define p (posn 1 2 3))
