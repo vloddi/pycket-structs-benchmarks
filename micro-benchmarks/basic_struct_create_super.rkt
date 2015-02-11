@@ -7,6 +7,8 @@
 
 (define v (make-vector SIZE))
 
+(collect-garbage)
+
 (time (let n-loop ([n (sub1 SIZE)])
   (vector-set! v n (3dposn n (+ 1 n) (+ 2 n)))
   (if (= 0 n)

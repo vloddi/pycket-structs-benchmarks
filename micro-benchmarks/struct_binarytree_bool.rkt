@@ -11,4 +11,5 @@
     (let ([d2 (- d 1)])
       (node item (generate-tree item d2) (generate-tree item d2)))))
 
+(collect-garbage)
 (time (generate-tree #f SIZE))

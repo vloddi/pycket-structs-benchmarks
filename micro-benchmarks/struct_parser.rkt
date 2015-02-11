@@ -82,4 +82,5 @@
            (second-bracket-pos s (add1 i) (sub1 prev)))
            (second-bracket-pos s (add1 i) prev)))
 
+(collect-garbage)
 (time (loop input 0))

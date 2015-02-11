@@ -7,6 +7,8 @@
 
 (define v (make-vector SIZE))
 
+(collect-garbage)
+
 (time (let n-loop ([n (sub1 SIZE)])
   (set-posn-x! p n)
   (vector-set! v n (posn-x p))

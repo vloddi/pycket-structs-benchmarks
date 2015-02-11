@@ -42,6 +42,8 @@
 (define SIZE 10000000)
 (define v (make-vector 10000000))
 
+(collect-garbage)
+
 (time
   (for ([i (sub1 SIZE)])
     (vector-set! v i (power/r (new-rand) 314159265.0 0))))

@@ -7,6 +7,8 @@
 
 (define v (make-vector SIZE))
 
+(collect-garbage)
+
 (time (let n-loop ([n (sub1 SIZE)])
   (define p0 (posn n (+ 1 n)))
   (define p1 (3dposn n (+ 1 n) (+ 2 n)))

@@ -32,4 +32,5 @@
             [(leaf? node-left b) (print-tree node-left b)]
             [(leaf? node-right b) (print-tree node-right b)])]))
 
+(collect-garbage)
 (time (generate-tree 1 SIZE))
