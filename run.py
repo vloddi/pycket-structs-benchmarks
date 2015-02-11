@@ -18,13 +18,17 @@ def update_progress(progress, benchmark = ''):
 def main():
     parser = argparse.ArgumentParser(description='Micro-benchmarks for Structs in Pycket.')
     parser.add_argument('--repeat', default=5)
-    parser.add_argument('--output', default='results.txt')
+    parser.add_argument('--output', default='execution_time.csv')
+    parser.add_argument('--memory_output', default='memor_consumption.csv')
     args = parser.parse_args()
 
     benchmarks = [f for f in os.listdir('./micro-benchmarks') if f.endswith('.rkt')]
-    open(args.output, 'w').close() # erase the results file
+    with open(args.output,'w') as f: f.write(';' + ';±;'.join(interpreters) + ';±\n')
+    with open(args.memory_output,'w') as f: f.write(';' + ';±;'.join(interpreters) + ';±\n')
+
     for (i, benchmark) in enumerate(benchmarks):
-        with open(args.output,'ab') as f: f.write(bytes(benchmark + '\n', 'UTF-8'))
+        with open(args.output,'ab') as f: f.write(bytes(benchmark, 'UTF-8'))
+        with open(args.memory_output,'ab') as f: f.write(bytes(benchmark, 'UTF-8'))
         for (j, interpreter) in enumerate(interpreters):
             update_progress(float(10*i + j) / float(len(benchmarks * 10) + len(interpreters)), benchmark)
             time, memory = [], []
@@ -45,11 +49,12 @@ def main():
             memory_avg = statistics.mean(memory)
             memory_sd = statistics.stdev(memory)
             memory_errors = z_score * memory_sd / math.sqrt(int(args.repeat))
-            with open(args.output,'ab') as f:
-                msg = interpreter + '\nExecution time: ' + str(time_avg) + ' ± ' + str(round(time_errors)) + \
-                    '\nMemory consumption: ' + str(memory_avg / 1048576.0) + ' ± ' + str(round(memory_errors / 1048576.0, 2)) + '\n\n'
-                f.write(bytes(msg, 'UTF-8'))
+            with open(args.output,'ab') as f: f.write(bytes(';' + str(time_avg) + ';' + str(round(time_errors)), 'UTF-8'))
+            with open(args.memory_output,'ab') as f:
+                # 1048576 = 1024 * 1024
+                f.write(bytes(';' + str(memory_avg / 1048576.0) + ';' + str(round(memory_errors / 1048576.0, 2)), 'UTF-8'))
         with open(args.output,'ab') as f: f.write(bytes('\n', 'UTF-8'))
+        with open(args.memory_output,'ab') as f: f.write(bytes('\n', 'UTF-8'))
     update_progress(1)
 
 if __name__ == '__main__':
