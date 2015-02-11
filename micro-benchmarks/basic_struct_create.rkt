@@ -8,7 +8,7 @@
 (collect-garbage)
 
 (time (let n-loop ([n (sub1 SIZE)])
-  (vector-set! v n (posn #f (+ 1 n)))
+  (vector-set! v n (posn (+ 1 n) (+ 2 n)))
   (if (= 0 n)
       'done
       (n-loop (sub1 n)))))

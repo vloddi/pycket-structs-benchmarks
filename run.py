@@ -1,37 +1,56 @@
 import argparse
 import math
 import os
-# import scipy.stats as st
 import statistics
 import subprocess
 
-PYCKET = "pycket"
-RACKET = "racket"
+interpreters = ('racket',
+    'pycket')
 
-parser = argparse.ArgumentParser(description="Micro-benchmarks for Structs in Pycket.")
-# parser.add_argument("--confidence", default=0.95)
-parser.add_argument("--repeat", default=5)
-args = parser.parse_args()
+z_score = 1.96 # for 95% confidence level
 
-z_score = 1.96
-# z_score = st.norm.ppf(float(args.confidence))
+def update_progress(progress, benchmark = ''):
+    width = int(os.popen('stty size', 'r').read().split()[1]) - 11 - len(benchmark)
+    benchmark_name = ' (' + benchmark + ')' if len(benchmark) > 0 else ''
+    print(('\r[{0:' + str(width) + 's}] {1:.1f}%').format('#' * int(progress * width),
+        progress * 100) + benchmark_name, end='', flush=True)
 
-for file in os.listdir("./micro-benchmarks"):
-    if file.endswith(".rkt"):
-        print("Runnung", file, "..")
-        for interpreter in (PYCKET, RACKET):
+def main():
+    parser = argparse.ArgumentParser(description='Micro-benchmarks for Structs in Pycket.')
+    parser.add_argument('--repeat', default=5)
+    parser.add_argument('--output', default='results.txt')
+    args = parser.parse_args()
+
+    benchmarks = [f for f in os.listdir('./micro-benchmarks') if f.endswith('.rkt')]
+    open(args.output, 'w').close() # erase the results file
+    for (i, benchmark) in enumerate(benchmarks):
+        with open(args.output,'ab') as f: f.write(bytes(benchmark + '\n', 'UTF-8'))
+        for (j, interpreter) in enumerate(interpreters):
+            update_progress(float(10*i + j) / float(len(benchmarks * 10) + len(interpreters)), benchmark)
             time, memory = [], []
-            for i in range(int(args.repeat)):
-                result = subprocess.check_output(["/usr/bin/time", "-lp", interpreter, "./micro-benchmarks/" + str(file)], stderr=subprocess.STDOUT)
-                result = str(result, encoding="utf8")
-                time.append(int(result.split(" real time:")[0][10:]))
-                memory.append(int(result.split("  maximum resident set size")[0].split("\n")[-1]))
+            for _ in range(int(args.repeat)):
+                result = str(subprocess.check_output(['/usr/bin/time', '-lp', interpreter,\
+                    './micro-benchmarks/' + str(benchmark)], stderr=subprocess.STDOUT), encoding='utf8')
+                try:
+                    current_time = int(result.split(' real time:')[0].split(' ')[-1])
+                    time.append(current_time)
+                    current_memory = int(result.split('  maximum resident set size')[0].split('\n')[-1])
+                    memory.append(current_memory)
+                except Exception:
+                    print('ERROR: Failed to parse result:', result)
+                    continue
             time_avg = statistics.mean(time)
             time_sd = statistics.stdev(time)
             time_errors = z_score * time_sd / math.sqrt(int(args.repeat))
             memory_avg = statistics.mean(memory)
             memory_sd = statistics.stdev(memory)
             memory_errors = z_score * memory_sd / math.sqrt(int(args.repeat))
-            print(interpreter)
-            print("Execution time:", time_avg, "±", round(time_errors),\
-                "\nMemory consumption:", memory_avg / 1048576.0, "±", round(memory_errors / 1048576.0), "\n")
+            with open(args.output,'ab') as f:
+                msg = interpreter + '\nExecution time: ' + str(time_avg) + ' ± ' + str(round(time_errors)) + \
+                    '\nMemory consumption: ' + str(memory_avg / 1048576.0) + ' ± ' + str(round(memory_errors / 1048576.0, 2)) + '\n\n'
+                f.write(bytes(msg, 'UTF-8'))
+        with open(args.output,'ab') as f: f.write(bytes('\n', 'UTF-8'))
+    update_progress(1)
+
+if __name__ == '__main__':
+    main()
