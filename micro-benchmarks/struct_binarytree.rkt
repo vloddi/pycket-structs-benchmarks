@@ -6,6 +6,8 @@
 (struct node leaf (left right))
 
 (define (generate-tree item d)
+  ; (when (= d 11)
+  ;   (collect-garbage))
   (if (= d 0)
     (leaf item)
     (let ([item2 (* item 2)]
