@@ -16,6 +16,8 @@
   (vector-set! v n (posn-y p))
   (set-posn-z! p (+ 2 n))
   (vector-set! v n (posn-z p))
+  ; (when (= (remainder n 20000000) 0)
+  ;     (collect-garbage))
   (if (= 0 n)
       'done
       (n-loop (sub1 n)))))

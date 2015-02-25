@@ -11,6 +11,8 @@
 
 (time (let n-loop ([n (sub1 SIZE)])
   (vector-set! v n (3dposn n (+ 1 n) (+ 2 n)))
+  ; (when (= (remainder n 5000000) 0)
+  ;     (collect-garbage))
   (if (= 0 n)
       'done
       (n-loop (sub1 n)))))

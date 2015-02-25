@@ -10,6 +10,8 @@
 
 (time (let n-loop ([n (sub1 SIZE)])
         (set-rand-seed! r (r))
+        ; (when (= (remainder n 5000000) 0)
+        ;   (collect-garbage))
         (if (= 0 n)
             'done
             (n-loop (sub1 n)))))
