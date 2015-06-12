@@ -1,4 +1,5 @@
-#lang racket/base
+#lang pycket
+(require racket/private/kw)
 
 (define SIZE 15000000)
 
